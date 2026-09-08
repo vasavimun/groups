@@ -36,11 +36,12 @@ export default function CustomVerticalStepper() {
       ipRole: "",
     }))
   );
-  const [utr, setUtr] = useState(""); 
+  const [utr, setUtr] = useState("");
 
   const validatePreferences = () => {
     const errors = [];
     const selectedCommittees = new Set();
+    let ipCount = 0;
 
     participants.forEach((participant, index) => {
       if (!participant.name.trim()) {
@@ -51,6 +52,13 @@ export default function CustomVerticalStepper() {
         errors.push(`Participant ${index + 1}: Preference is required.`);
       } else {
         selectedCommittees.add(participant.preference);
+
+        if(participant.preference === "IP"){
+          ipCount+=1;
+          if(!participant.ipRole){
+            errors.push(`Participant ${index + 1}: Please select a role for IP.`);
+          }
+        }
 
         if (participant.preference !== "IP") {
           if (
@@ -83,6 +91,10 @@ export default function CustomVerticalStepper() {
         }
       }
     });
+
+    if (ipCount > 3){
+      errors.push(`Maximum 3 participants can choose IP`)
+    }
 
 
     //COMMITTEES CHANGE
