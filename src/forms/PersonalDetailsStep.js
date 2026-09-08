@@ -29,9 +29,6 @@ export default function PersonalDetailsStep({
 }) {
   return (
     <div>
-      <h1 style={{ color: "#94a3b8", backgroundColor: "#0f172a", padding: "8px 12px", fontSize: "1.25rem", borderLeft: "4px solid #334155", textAlign:"center" }}>
-        <b>No Private Delegations are allowed</b>
-      </h1>
       <input
         type="text"
         placeholder="Name of the Head Delegate"

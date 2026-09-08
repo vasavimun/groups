@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import PersonalDetailsStep from "./PersonalDetailsStep";
 import PreferencesStep from "./PreferencesStep";
 import PaymentStep from "./PaymentStep";
+import DelegationCriteria from "./DelegationCriteria";
 import "./step.css";
 import "./form.css";
 
@@ -92,8 +93,10 @@ export default function CustomVerticalStepper() {
       }
     });
 
-    if (ipCount > 3){
-      errors.push(`Maximum 3 participants can choose IP`)
+    if (ipCount < 1) {
+      errors.push("At least 1 delegate must be in IP");
+    } else if (ipCount > 3) {
+      errors.push(`At most 3 delegates can be in IP. Currently selected: ${ipCount}.`);
     }
 
 
@@ -116,6 +119,7 @@ export default function CustomVerticalStepper() {
   };
 
   const steps = [
+    {component: <DelegationCriteria/>},
     {
       component: (
         <PersonalDetailsStep
@@ -175,7 +179,10 @@ export default function CustomVerticalStepper() {
   ];
 
   const validateStep = () => {
-    if (activeStep === 0) {
+    if (activeStep === 0){
+      return true;
+    }
+    if (activeStep === 1) {
       const phoneRegex = /^[0-9]{10}$/;
 
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -254,7 +261,7 @@ export default function CustomVerticalStepper() {
       }
 
       return true;
-    } else if (activeStep === 1) {
+    } else if (activeStep === 2) {
       const preferencesValid = validatePreferences();
       if (!preferencesValid) return false;
     // } else if (activeStep === 2) {
