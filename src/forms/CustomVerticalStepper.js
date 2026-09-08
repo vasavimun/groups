@@ -84,7 +84,9 @@ export default function CustomVerticalStepper() {
       }
     });
 
-    const committees = ["UNGA-DISEC", "AIPPM", "UNHRC","NATO", "IP"];
+
+    //COMMITTEES CHANGE
+    const committees = ["UNGA-DISEC", "JSP", "UNCSW","INTERPOL", "IP", "CCC"];
     committees.forEach((committee) => {
       if (!selectedCommittees.has(committee)) {
         errors.push(
@@ -291,7 +293,8 @@ export default function CustomVerticalStepper() {
         name,
         phone,
         email,
-        teamName,
+        teamName,                                                                                                                                          
+        isVasavi,
         address,
         instituteName,
         munExperienceDetails,
@@ -308,6 +311,8 @@ export default function CustomVerticalStepper() {
 
       console.log("Submitting form data:", formData);
 
+
+      //SERVER CHANGE
       fetch("https://mun-dat-gilt.vercel.app/groupregister", {
         method: "POST",
         headers: {

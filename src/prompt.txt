@@ -1,0 +1,1632 @@
+Project Path: src
+
+Source Tree:
+
+```txt
+src
+├── App.css
+├── App.js
+├── App.test.js
+├── forms
+│   ├── AnanyaQR.png
+│   ├── CustomVerticalStepper.js
+│   ├── PaymentStep.js
+│   ├── PersonalDetailsStep.js
+│   ├── PreferencesStep.js
+│   ├── QR1.png
+│   ├── form.css
+│   ├── qr_yashwant.jpeg
+│   ├── reg_back.webp
+│   ├── regback.webp
+│   ├── step.css
+│   └── temp.js
+├── index.css
+├── index.js
+├── reportWebVitals.js
+└── setupTests.js
+
+```
+
+`App.css`:
+
+```css
+.App {
+  background-color: black;
+}
+#head {
+  text-align: center;
+  position: relative;
+  margin-top: 0px;
+  color: white;
+}
+
+#head::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background-color: black;
+}
+
+```
+`App.js`:
+
+```js
+import React from "react";
+import "./App.css";
+import CustomVerticalStepper from "./forms/CustomVerticalStepper";
+
+function App() {
+  return (
+    <div className="App">
+      {/* <h1 id="head">Registration</h1> */}
+      <CustomVerticalStepper></CustomVerticalStepper>
+    </div>
+  );
+}
+
+export default App;
+
+```
+`App.test.js`:
+
+```js
+import { render, screen } from '@testing-library/react';
+import App from './App';
+
+test('renders learn react link', () => {
+  render(<App />);
+  const linkElement = screen.getByText(/learn react/i);
+  expect(linkElement).toBeInTheDocument();
+});
+
+```
+`forms/CustomVerticalStepper.js`:
+
+```js
+import React, { useState } from "react";
+
+import PersonalDetailsStep from "./PersonalDetailsStep";
+import PreferencesStep from "./PreferencesStep";
+import PaymentStep from "./PaymentStep";
+import "./step.css";
+import "./form.css";
+
+export default function CustomVerticalStepper() {
+  const [activeStep, setActiveStep] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [isVasavi, setIsVasavi] = useState(false);
+  const [rollNumber, setRollNumber] = useState("");
+  const [year, setYear] = useState("");
+  const [branch, setBranch] = useState("");
+  const [section, setSection] = useState("");
+  const [transactionId, setTransactionId] = useState("");
+  const [driveLink, setDriveLink] = useState("");
+  const [instituteName, setInstituteName] = useState("");
+  const [munExperienceDetails, setMunExperienceDetails] = useState("");
+  const [participantsCount, setParticipantsCount] = useState(8);
+  const [amount, setAmount] = useState("");
+  const [teamName, setTeamName] = useState("");
+  const [participants, setParticipants] = useState(
+    Array.from({ length: participantsCount }, () => ({
+      name: "",
+      phone: "",
+      email: "",
+      preference: "",
+      portfolio1: "",
+      portfolio2: "",
+      ipRole: "",
+    }))
+  );
+  const [utr, setUtr] = useState(""); 
+
+  const validatePreferences = () => {
+    const errors = [];
+    const selectedCommittees = new Set();
+
+    participants.forEach((participant, index) => {
+      if (!participant.name.trim()) {
+        errors.push(`Participant ${index + 1}: Name is required.`);
+      }
+
+      if (!participant.preference) {
+        errors.push(`Participant ${index + 1}: Preference is required.`);
+      } else {
+        selectedCommittees.add(participant.preference);
+
+        if (participant.preference !== "IP") {
+          if (
+            !participant.portfolio1.trim() ||
+            !participant.portfolio2.trim()
+          ) {
+            errors.push(
+              `Participant ${
+                index + 1
+              }: Both portfolio 1 and 2 are required for preference ${
+                participant.preference
+              }.`
+            );
+          } else if (
+            participant.portfolio1.trim().toLowerCase() ===
+            participant.portfolio2.trim().toLowerCase()
+          ) {
+            errors.push(
+              `Participant ${
+                index + 1
+              }: Portfolio 1 and Portfolio 2 must be different for preference ${
+                participant.preference
+              }.`
+            );
+          }
+        }
+
+        if (participant.preference === "IP" && !participant.ipRole) {
+          errors.push(`Participant ${index + 1}: Please select a role for IP.`);
+        }
+      }
+    });
+
+
+    //COMMITTEES CHANGE
+    const committees = ["UNGA-DISEC", "JSP", "UNCSW","INTERPOL", "IP", "CCC"];
+    committees.forEach((committee) => {
+      if (!selectedCommittees.has(committee)) {
+        errors.push(
+          `At least one participant must select the preference "${committee}".`
+        );
+      }
+    });
+
+    if (errors.length > 0) {
+      alert(errors.join("\n"));
+      return false;
+    }
+
+    return true;
+  };
+
+  const steps = [
+    {
+      component: (
+        <PersonalDetailsStep
+          name={name}
+          setName={setName}
+          phone={phone}
+          setPhone={setPhone}
+          email={email}
+          setEmail={setEmail}
+          address={address}
+          setAddress={setAddress}
+          isVasavi={isVasavi}
+          setIsVasavi={setIsVasavi}
+          rollNumber={rollNumber}
+          setRollNumber={setRollNumber}
+          year={year}
+          setYear={setYear}
+          branch={branch}
+          setBranch={setBranch}
+          section={section}
+          setSection={setSection}
+          instituteName={instituteName}
+          setInstituteName={setInstituteName}
+          munExperienceDetails={munExperienceDetails}
+          setMunExperienceDetails={setMunExperienceDetails}
+          teamName={teamName}
+          setTeamName={setTeamName}
+        />
+      ),
+    },
+    {
+      component: (
+        <PreferencesStep
+          participantsCount={participantsCount}
+          setParticipantsCount={setParticipantsCount}
+          participants={participants}
+          setParticipants={setParticipants}
+        />
+      ),
+    },
+    {
+      component: (
+        <PaymentStep
+          isVasavi={isVasavi}
+          transactionId={transactionId}
+          setTransactionId={setTransactionId}
+          driveLink={driveLink}
+          setDriveLink={setDriveLink}
+          participantsCount={participantsCount}
+          amount={amount}
+          setAmount={setAmount}
+          utr={utr}
+          setUtr={setUtr}
+        />
+      ),
+    },
+  ];
+
+  const validateStep = () => {
+    if (activeStep === 0) {
+      const phoneRegex = /^[0-9]{10}$/;
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      const rollNumberRegex =
+        /^[0-9]{4}-[0-9A-Za-z]{2}-[0-9A-Za-z]{3}-[0-9A-Za-z]{3}$/;
+
+      if (!name) {
+        alert("Please fill in your name.");
+        return false;
+      }
+
+      if (!phone) {
+        alert("Please fill in your phone number.");
+        return false;
+      }
+      if (!teamName) {
+        alert("Please enter Group delegation name");
+        return false;
+      }
+
+      if (!phoneRegex.test(phone)) {
+        alert("Phone number must be exactly 10 digits.");
+        return false;
+      }
+
+      if (!email) {
+        alert("Please fill in your email.");
+        return false;
+      }
+      if (!instituteName) {
+        alert("Enter your institute name");
+        return false;
+      }
+
+      if (!emailRegex.test(email)) {
+        alert("Please enter a valid email address.");
+        return false;
+      }
+
+      if (!address) {
+        alert("Please fill in your address.");
+        return false;
+      }
+      if (!instituteName) {
+      }
+
+      if (isVasavi) {
+        if (!rollNumber) {
+          alert("Please fill in your roll number.");
+          return false;
+        }
+
+        if (!rollNumberRegex.test(rollNumber)) {
+          alert("Roll number must be in the format 1602-2X-XXX-XXX.");
+          return false;
+        }
+
+        if (!year) {
+          alert("Please select your year.");
+          return false;
+        }
+        if (!munExperienceDetails) {
+          alert("Fill in MUN Experience");
+          return false;
+        }
+        if (!branch) {
+          alert("Please select your branch.");
+          return false;
+        }
+
+        if (!section) {
+          alert("Please select your section.");
+          return false;
+        }
+      }
+
+      return true;
+    } else if (activeStep === 1) {
+      const preferencesValid = validatePreferences();
+      if (!preferencesValid) return false;
+    // } else if (activeStep === 2) {
+    //   if (!transactionId) {
+    //     alert("Transaction ID is required.");
+    //     return false;
+    //   }
+    //   if (!driveLink) {
+    //     alert("Drive link is required.");
+    //     return false;
+    //   }
+
+    //   const driveUrlPattern =
+    //     /https:\/\/drive\.google\.com\/(?:file\/d\/|drive\/folders\/)([-\w]+)/;
+
+      
+     
+    }
+
+    return true;
+  };
+
+  const handleNext = () => {
+    if (validateStep()) {
+      setActiveStep((prevStep) => prevStep + 1);
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const handleBack = () => {
+    if (activeStep > 0) {
+      setActiveStep((prevStep) => prevStep - 1);
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const handleSubmit = () => {
+    if (validateStep()) {
+      setLoading(true);
+
+      const formData = {
+        name,
+        phone,
+        email,
+        teamName,
+        address,
+        instituteName,
+        munExperienceDetails,
+        rollNumber,
+        year,
+        branch,
+        section,
+        participants,
+        amount,
+        transactionId,
+        driveLink,
+        utr,
+      };
+
+      console.log("Submitting form data:", formData);
+
+
+      //SERVER CHANGE
+      fetch("https://mun-dat-gilt.vercel.app/groupregister", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Success:", data);
+          alert("Form submitted successfully!");
+          resetForm();
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("Failed to submit the form. Please try again.");
+          setLoading(false);
+        });
+    }
+  };
+
+  const resetForm = () => {
+    setName("");
+    setPhone("");
+    setEmail("");
+    setMunExperienceDetails("");
+    setTeamName("");
+    setInstituteName("");
+    setAddress("");
+    setIsVasavi(false);
+    setRollNumber("");
+    setYear("");
+    setBranch("");
+    setSection("");
+    setTransactionId("");
+    setDriveLink("");
+    setActiveStep(0);
+    setParticipantsCount(8);
+    setAmount("");
+    setParticipants(
+      Array.from({ length: participantsCount }, () => ({
+        name: "",
+        preference: "",
+        portfolio1: "",
+        portfolio2: "",
+        ipRole: "",
+      }))
+    );
+  };
+
+  return (
+    <div className="stepper-wrapper">
+      {loading ? (
+        <>
+          <div className="loader-container">
+            <div className="pulsing-circle"></div>
+            <p>Submitting Response</p>
+          </div>
+        </>
+      ) : (
+        <div className="stepper-container">
+          <div className="stepper-header">
+            <div className="step-header">{steps[activeStep].label}</div>
+          </div>
+          <div className="stepper-content">{steps[activeStep].component}</div>
+          <div className="step-actions">
+            {activeStep > 0 && (
+              <button className="btn" onClick={handleBack}>
+                Back
+              </button>
+            )}
+            {activeStep < steps.length - 1 ? (
+              <button className="btn" onClick={handleNext}>
+                Next
+              </button>
+            ) : (
+              <button className="btn" onClick={handleSubmit}>
+                Submit
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+```
+`forms/PaymentStep.js`:
+
+```js
+import React, { useEffect } from "react";
+import { FaRegCopy } from "react-icons/fa";
+import qrCode3 from "./qr_yashwant.jpeg";
+
+export default function PaymentStep({
+  isVasavi,
+  transactionId,
+  setTransactionId,
+  driveLink,
+  setDriveLink,
+  participantsCount,
+  amount,
+  setAmount,
+  utr,
+  setUtr,
+}) {
+  const baseFee = isVasavi ? 800 : 1300;
+  const totalFee = baseFee * participantsCount;
+  const upiID = "8897327157@axl";
+  const no = isVasavi ? "8341565849" : "9347454299";
+
+  useEffect(() => {
+    setAmount(totalFee);
+  }, [totalFee, setAmount]);
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("UPI ID copied!");
+    });
+  };
+
+  return (
+    <div style={{ textAlign: "center", color: "white" }}>
+      <h2>Pay the registration fee of ₹{totalFee}</h2>
+
+      {/* Payment Inputs */}
+      <div
+        style={{
+          marginTop: "20px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "10px",
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Enter Transaction ID"
+          value={transactionId}
+          onChange={(e) => setTransactionId(e.target.value)}
+          style={{ padding: "10px", width: "250px" }}
+        />
+
+        <input
+          type="text"
+          placeholder="Payment Screenshot (Drive Link)"
+          value={driveLink}
+          onChange={(e) => setDriveLink(e.target.value)}
+          style={{ padding: "10px", width: "250px" }}
+        />
+
+        <p style={{ fontSize: "0.9rem" }}>
+          Ensure drive access is not restricted
+        </p>
+      </div>
+
+      {/* UPI Section */}
+      <div
+        style={{
+          marginTop: "25px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "10px",
+        }}
+      >
+        <p
+          style={{
+            padding: "8px 15px",
+            borderRadius: "8px",
+            backgroundColor: "black",
+            fontWeight: "bold",
+          }}
+        >
+          {upiID}
+        </p>
+
+        <FaRegCopy
+          onClick={() => copyToClipboard(upiID)}
+          style={{
+            cursor: "pointer",
+            fontSize: "1.4rem",
+          }}
+        />
+      </div>
+
+      {/* OR Text */}
+      <p style={{ marginTop: "25px", fontWeight: "bold" }}>
+        OR Use the QR Code Below
+      </p>
+
+      {/* QR Code */}
+      <div
+        style={{
+          marginTop: "15px",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <img
+          src={qrCode3}
+          alt="QR Code"
+          style={{
+            width: "220px",
+            borderRadius: "12px",
+            border: "1px solid #ccc",
+            padding: "10px",
+            backgroundColor: "white",
+          }}
+        />
+      </div>
+
+      <p style={{ marginTop: "20px" }}>
+        For payment issues, contact: {no}
+      </p>
+    </div>
+  );
+}
+
+```
+`forms/PersonalDetailsStep.js`:
+
+```js
+import React from "react";
+import "./form.css";
+
+export default function PersonalDetailsStep({
+  name,
+  setName,
+  phone,
+  setPhone,
+  email,
+  setEmail,
+  address,
+  setAddress,
+  isVasavi,
+  setIsVasavi,
+  rollNumber,
+  setRollNumber,
+  year,
+  setYear,
+  branch,
+  setBranch,
+  section,
+  setSection,
+  munExperienceDetails,
+  setMunExperienceDetails,
+  instituteName,
+  setInstituteName,
+  teamName,
+  setTeamName,
+}) {
+  return (
+    <div>
+      <input
+        type="text"
+        placeholder="Name of the Head Delegate"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+      />
+      <input
+        type="tel"
+        placeholder="Phone Number"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+        required
+      />
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+      />
+      <input
+        type="text"
+        placeholder="Group delegation name"
+        value={teamName}
+        onChange={(e) => setTeamName(e.target.value)}
+        required
+      />
+      {!isVasavi && (
+        <input
+          type="text"
+          placeholder="Institute Name"
+          value={instituteName}
+          onChange={(e) => setInstituteName(e.target.value)}
+          required
+        />
+      )}
+      <input
+        type="text"
+        placeholder="Address"
+        value={address}
+        onChange={(e) => setAddress(e.target.value)}
+        required
+      />
+
+      <textarea
+        className="mun-experience"
+        placeholder="Describe the delegation Experience (if any): Participant name/Conference name/committee/ portfolio/ award"
+        value={munExperienceDetails}
+        onChange={(e) => setMunExperienceDetails(e.target.value)}
+      />
+
+      <div className="radio-container">
+        <input
+          id="vasavi"
+          className="toggle"
+          name="toggle"
+          type="radio"
+          value="vasavi"
+          checked={isVasavi}
+          onChange={() => {
+            setIsVasavi(true);
+            setInstituteName("Vasavi College of Engineering");
+          }}
+        />
+        <label htmlFor="vasavi" className={`btn ${isVasavi ? "selected" : ""}`}>
+          Vasavi College
+        </label>
+        <input
+          id="external"
+          className="toggle"
+          name="toggle"
+          type="radio"
+          value="external"
+          checked={!isVasavi}
+          onChange={() => {
+            setIsVasavi(false);
+            setInstituteName("");
+          }}
+        />
+        <label
+          htmlFor="external"
+          className={`btn ${!isVasavi ? "selected" : ""}`}
+        >
+          External Delegation
+        </label>
+      </div>
+
+      {isVasavi && (
+        <>
+          <input
+            type="text"
+            placeholder="Roll Number"
+            value={rollNumber}
+            onChange={(e) => setRollNumber(e.target.value)}
+            required
+          />
+          <select
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            required
+          >
+            <option value="">Select Year</option>
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+          </select>
+          <select
+            value={branch}
+            onChange={(e) => setBranch(e.target.value)}
+            required
+          >
+            <option value="">Select Branch</option>
+            <option value="CSE">CSE</option>
+            <option value="CSM">CSM</option>
+            <option value="CIVIL">CIVIL</option>
+            <option value="ECE">ECE</option>
+            <option value="EEE">EEE</option>
+            <option value="MECHANICAL">MECHANICAL</option>
+            <option value="IT">IT</option>
+          </select>
+          <input
+            type="text"
+            placeholder="Section"
+            value={section}
+            onChange={(e) => setSection(e.target.value)}
+            required
+          />
+        </>
+      )}
+    </div>
+  );
+}
+
+```
+`forms/PreferencesStep.js`:
+
+```js
+import React from "react";
+import { FaBookOpen } from "react-icons/fa";
+
+const committees = ["UNGA-DISEC", "JSP", "UNCSW","INTERPOL", "IP", "CCC"];
+const ipRoles = [
+  "Photographer",
+  "Reporter - UNGA-DISEC",
+  "Reporter - JSP",
+  "Reporter - UNCSW",
+  "Reporter - INTERPOL",
+  "Reporter - CCC",
+];
+
+
+export default function PreferencesStep({
+  participantsCount,
+  setParticipantsCount,
+  participants,
+  setParticipants,
+}) {
+  const handleParticipantsCountChange = (e) => {
+    const count = parseInt(e.target.value, 10);
+    setParticipantsCount(count);
+    setParticipants(
+      Array.from(
+        { length: count },
+        (_, i) =>
+          participants[i] || {
+            name: "",
+            preference: "",
+            portfolio1: "",
+            portfolio2: "",
+            ipRole: "",
+          }
+      )
+    );
+  };
+
+  const handleInputChange = (index, field, value) => {
+    const updatedParticipants = [...participants];
+
+    if (field === "preference") {
+      updatedParticipants[index] = {
+        ...updatedParticipants[index],
+        preference: value,
+        portfolio1: "",
+        portfolio2: "",
+        ipRole: "",
+      };
+    } else {
+      updatedParticipants[index][field] = value;
+    }
+
+    setParticipants(updatedParticipants);
+  };
+
+  return (
+    <div>
+      <div className="hd">
+        <label className="btn">
+          <h3>Committee Preference</h3>
+        </label>
+        <a
+          href="https://docs.google.com/spreadsheets/d/15ZVV8TdOkXpDK4Ja6B0X_IA7Vb6BEUgcEqw4IJORsoc/edit?usp=sharing"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            textDecoration: "none",
+          }}
+        >
+          <p
+            style={{
+              padding: "8px",
+              borderRadius: "8px",
+              backgroundColor: "black",
+              color: "white",
+              fontSize: "1rem",
+              fontWeight: "bold",
+              display: "inline-flex",
+              alignItems: "center",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <FaBookOpen style={{ marginRight: "8px" }} /> Country Matrices
+          </p>
+        </a>
+      </div>
+
+      <label>
+        <h3>Number of Participants</h3>
+        <select
+          value={participantsCount}
+          onChange={handleParticipantsCountChange}
+        >
+          {[...Array(13).keys()].map((_, i) => (
+            <option key={i} value={i + 8}>
+              {i + 8}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <form>
+        {participants.map((participant, index) => (
+          <div
+            key={index}
+            className="participant-form"
+            style={{
+              marginBottom: "20px",
+              padding: "10px",
+              border: "1px solid lightgray",
+              borderRadius: "8px",
+            }}
+          >
+            <h2
+              style={{
+                padding: "10px",
+                borderRadius: "8px",
+                backgroundColor: "black",
+                color: "white",
+                fontSize: "1rem",
+                fontWeight: "bold",
+                display: "inline-flex",
+                alignItems: "center",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Participant {index + 1}
+            </h2>
+
+            <input
+              type="text"
+              placeholder="Name"
+              value={participant.name}
+              onChange={(e) => handleInputChange(index, "name", e.target.value)}
+              required
+            />
+
+            <h4>Preference</h4>
+            <select
+              value={participant.preference}
+              onChange={(e) =>
+                handleInputChange(index, "preference", e.target.value)
+              }
+              required
+            >
+              <option value="">Select preference</option>
+              {committees.map((committee, idx) => (
+                <option key={idx} value={committee}>
+                  {committee}
+                </option>
+              ))}
+            </select>
+
+            {participant.preference === "IP" && (
+              <select
+                value={participant.ipRole}
+                onChange={(e) =>
+                  handleInputChange(index, "ipRole", e.target.value)
+                }
+                required
+              >
+                <option value="">Select Role</option>
+                {ipRoles.map((role, idx) => (
+                  <option key={idx} value={role}>
+                    {role}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {participant.preference && participant.preference !== "IP" && (
+              <>
+                <input
+                  type="text"
+                  placeholder="Portfolio / Country - 1"
+                  value={participant.portfolio1}
+                  onChange={(e) =>
+                    handleInputChange(index, "portfolio1", e.target.value)
+                  }
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Portfolio / Country - 2"
+                  value={participant.portfolio2}
+                  onChange={(e) =>
+                    handleInputChange(index, "portfolio2", e.target.value)
+                  }
+                  required
+                />
+              </>
+            )}
+          </div>
+        ))}
+      </form>
+    </div>
+  );
+}
+
+```
+`forms/form.css`:
+
+```css
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  margin-top: 10px;
+  border: none;
+  border-bottom: 2px solid #ddd;
+  border-radius: 0;
+  box-sizing: border-box;
+  background: none;
+  color: #fff;
+  font-size: 16px;
+  outline: none;
+}
+
+select::-ms-expand {
+  display: none;
+}
+
+select::-webkit-inner-spin-button,
+select::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+select::-webkit-dropdown-button {
+  -webkit-appearance: none;
+}
+
+select option {
+  background: #fff;
+  color: #000;
+  padding: 10px;
+  font-size: 16px;
+}
+
+input::placeholder {
+  color: #fff;
+  font-weight: 900;
+  font-size: 16px;
+}
+
+textarea::placeholder {
+  color: #000000;
+  font-weight: 900;
+  font-size: 16px;
+}
+
+select {
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-bottom: 3px solid;
+}
+
+textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+.toggle-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.toggle-container label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.toggle-container .toggle-label {
+  margin-left: 10px;
+  color: white;
+}
+
+.radio-container input[type="radio"].toggle {
+  display: none;
+}
+
+.radio-container .btn {
+  border: 3px solid #1a1a1a;
+  display: inline-block;
+  padding: 10px 20px;
+  position: relative;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 20px;
+  transition: 300ms ease, color 300ms ease;
+  margin-right: 10px;
+  background: #000000;
+}
+
+.radio-container .btn.selected {
+  background: #000000;
+  color: rgb(255, 255, 255);
+  border-color: white;
+}
+
+.radio-container input[type="radio"].toggle:checked + label {
+  color: #fff;
+}
+
+.radio-container input[type="radio"].toggle:checked + label:after {
+  background: #1a1a1a;
+  left: 0;
+}
+
+.mun-experience {
+  background: rgba(255, 255, 255, 0.6);
+  color: black;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.country-preferences {
+  display: flex;
+  gap: 10px;
+}
+
+.country-preferences input {
+  flex: 1;
+}
+
+.hd .btn {
+  display: inline-block;
+  padding-top: 0px;
+  padding-bottom: 0;
+  padding-right: 60px;
+  margin-left: 0;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: 300ms ease, color 300ms ease;
+  margin-right: 10px;
+  background: #000000;
+}
+.ip-role {
+  width: 50%;
+}
+
+```
+`forms/step.css`:
+
+```css
+.stepper-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #000000;
+  padding: 20px;
+  background-image: linear-gradient(
+      rgba(12, 12, 12, 0.841),
+      rgba(16, 16, 16, 0.834)
+    ),
+    url("reg_back.webp");
+  background-size: cover;
+  background-repeat: no-repeat;
+  margin: 0;
+}
+.stepper-container {
+  background: #e1e1e13c;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(83, 83, 83, 0.088);
+  width: 100%;
+  max-width: 500px;
+  padding: 30px;
+
+  box-sizing: border-box;
+}
+
+.stepper-header {
+  margin-bottom: 20px;
+}
+
+.step-header {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+}
+
+.stepper-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.step-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+h4,
+h3,
+h2 {
+  font-weight: 700;
+  color: white;
+  padding: 0;
+}
+h4 {
+  margin-bottom: 0;
+}
+
+.btn {
+  background-color: #0e14c1;
+  border: none;
+  color: #ffffff;
+  font-weight: 400;
+  font-size: 17px;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  margin-right: 0;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  background-color: #1d1d1d;
+}
+.reset-container {
+  text-align: center;
+}
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.loader-container p {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  margin-top: 20px;
+}
+
+.pulsing-circle {
+  width: 100px;
+  height: 100px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+}
+@media (max-width: 768px) {
+  .stepper-wrapper {
+    background-image: linear-gradient(
+        rgba(12, 12, 12, 0.758),
+        rgba(16, 16, 16, 0.77)
+      ),
+      url("regback.webp");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .stepper-container {
+    padding: 20px;
+    max-width: 90%;
+  }
+
+  .btn {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}
+
+```
+`forms/temp.js`:
+
+```js
+import React from "react";
+import { FaBookOpen } from "react-icons/fa";
+
+const committees = ["UNGA-DISEC", "AIPPM", "UNHRC", "NATO", "IP"];
+const ipRoles = [
+  "Photographer",
+  "Reporter - UNGA-DISEC",
+  "Reporter - AIPPM",
+  "Reporter - NATO",
+  "Reporter - UNHRC",
+];
+
+export default function PreferencesStep({
+  preference1,
+  setPreference1,
+  preference2,
+  setPreference2,
+  preference3,
+  setPreference3,
+  portfolio1Pref1,
+  setportfolio1Pref1,
+  portfolio2Pref1,
+  setportfolio2Pref1,
+  portfolio1Pref2,
+  setportfolio1Pref2,
+  portfolio2Pref2,
+  setportfolio2Pref2,
+  portfolio1Pref3,
+  setportfolio1Pref3,
+  portfolio2Pref3,
+  setportfolio2Pref3,
+  ipRole1,
+  setIpRole1,
+  ipRole2,
+  setIpRole2,
+  ipRole3,
+  setIpRole3,
+}) {
+  const handlePreference1Change = (value) => {
+    setPreference1(value);
+    setportfolio1Pref1("");
+    setportfolio2Pref1("");
+    setIpRole1("");
+  };
+
+  const handlePreference2Change = (value) => {
+    setPreference2(value);
+    setportfolio1Pref2("");
+    setportfolio2Pref2("");
+    setIpRole2("");
+  };
+
+  const handlePreference3Change = (value) => {
+    setPreference3(value);
+    setportfolio1Pref3("");
+    setportfolio2Pref3("");
+    setIpRole3("");
+  };
+
+  return (
+    <div>
+      <div className="hd">
+        <label className="btn">
+          <h3>Committee Preference</h3>
+        </label>
+        <a
+          href="https://docs.google.com/spreadsheets/d/10-hKlo3oR5dMq0zpd2tCOk11WGoudPvfCI3EauPGVFs/edit?usp=sharing"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            textDecoration: "none",
+          }}
+        >
+          <p
+            style={{
+              padding: "8px",
+              borderRadius: "8px",
+              backgroundColor: "black",
+              color: "white",
+              fontSize: "1rem",
+              fontWeight: "bold",
+              display: "inline-flex",
+              alignItems: "center",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <FaBookOpen style={{ marginRight: "8px" }} /> Country Matrices
+          </p>
+        </a>
+      </div>
+
+      {/* Preference 1 */}
+      <h4>Preference 1</h4>
+      <select
+        value={preference1}
+        onChange={(e) => handlePreference1Change(e.target.value)}
+        required
+      >
+        <option value="">Select Preference 1</option>
+        {committees.map((committee, index) => (
+          <option key={index} value={committee}>
+            {committee}
+          </option>
+        ))}
+      </select>
+
+      {preference1 === "IP" && (
+        <div className="ip-role">
+          <label>
+            <select
+              value={ipRole1}
+              onChange={(e) => setIpRole1(e.target.value)}
+              required
+            >
+              <option value="">Select Role</option>
+              {ipRoles.map((role, index) => (
+                <option key={index} value={role}>
+                  {role}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
+
+      {preference1 && preference1 !== "IP" && (
+        <div className="portfolio-preferences">
+          <input
+            type="text"
+            placeholder="portfolio 1"
+            value={portfolio1Pref1}
+            onChange={(e) => setportfolio1Pref1(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="portfolio 2"
+            value={portfolio2Pref1}
+            onChange={(e) => setportfolio2Pref1(e.target.value)}
+            required
+          />
+        </div>
+      )}
+
+      <br></br>
+      <br></br>
+
+      {/* Preference 2 */}
+      <h4>Preference 2</h4>
+      <select
+        value={preference2}
+        onChange={(e) => handlePreference2Change(e.target.value)}
+        required
+        disabled={!preference1}
+      >
+        <option value="">Select Preference 2</option>
+        {committees.map((committee, index) => (
+          <option key={index} value={committee}>
+            {committee}
+          </option>
+        ))}
+      </select>
+
+      {preference2 === "IP" && (
+        <div className="ip-role">
+          <label>
+            <select
+              value={ipRole2}
+              onChange={(e) => setIpRole2(e.target.value)}
+              required
+            >
+              <option value="">Select Role</option>
+              {ipRoles.map((role, index) => (
+                <option key={index} value={role}>
+                  {role}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
+
+      {preference2 && preference2 !== "IP" && (
+        <div className="portfolio-preferences">
+          <input
+            type="text"
+            placeholder="portfolio 1"
+            value={portfolio1Pref2}
+            onChange={(e) => setportfolio1Pref2(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="portfolio 2"
+            value={portfolio2Pref2}
+            onChange={(e) => setportfolio2Pref2(e.target.value)}
+            required
+          />
+        </div>
+      )}
+
+      <br></br>
+      <br></br>
+
+      {/* Preference 3 */}
+      <h4>Preference 3</h4>
+      <select
+        value={preference3}
+        onChange={(e) => handlePreference3Change(e.target.value)}
+        required
+        disabled={!preference2}
+      >
+        <option value="">Select Preference 3</option>
+        {committees.map((committee, index) => (
+          <option key={index} value={committee}>
+            {committee}
+          </option>
+        ))}
+      </select>
+
+      {preference3 === "IP" && (
+        <div className="ip-role">
+          <label>
+            <select
+              value={ipRole3}
+              onChange={(e) => setIpRole3(e.target.value)}
+              required
+            >
+              <option value="">Select Role</option>
+              {ipRoles.map((role, index) => (
+                <option key={index} value={role}>
+                  {role}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
+
+      {preference3 && preference3 !== "IP" && (
+        <div className="portfolio-preferences">
+          <input
+            type="text"
+            placeholder="portfolio 1"
+            value={portfolio1Pref3}
+            onChange={(e) => setportfolio1Pref3(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="portfolio 2"
+            value={portfolio2Pref3}
+            onChange={(e) => setportfolio2Pref3(e.target.value)}
+            required
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+```
+`index.css`:
+
+```css
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+```
+`index.js`:
+
+```js
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+
+```
+`reportWebVitals.js`:
+
+```js
+const reportWebVitals = onPerfEntry => {
+  if (onPerfEntry && onPerfEntry instanceof Function) {
+    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+      getCLS(onPerfEntry);
+      getFID(onPerfEntry);
+      getFCP(onPerfEntry);
+      getLCP(onPerfEntry);
+      getTTFB(onPerfEntry);
+    });
+  }
+};
+
+export default reportWebVitals;
+
+```
+`setupTests.js`:
+
+```js
+// jest-dom adds custom jest matchers for asserting on DOM nodes.
+// allows you to do things like:
+// expect(element).toHaveTextContent(/react/i)
+// learn more: https://github.com/testing-library/jest-dom
+import '@testing-library/jest-dom';
+
+```
