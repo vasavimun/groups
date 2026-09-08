@@ -308,7 +308,7 @@ export default function CustomVerticalStepper() {
 
       console.log("Submitting form data:", formData);
 
-      fetch("https://mun-dat.onrender.com/groupregister", {
+      fetch("https://mun-dat-gilt.vercel.app/groupregister", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
