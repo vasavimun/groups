@@ -14,7 +14,7 @@ export default function PaymentStep({
   utr,
   setUtr,
 }) {
-  const baseFee = isVasavi ? 800 : 1300;
+  const baseFee = isVasavi ? 1100 : 1500;
   const totalFee = baseFee * participantsCount;
   const upiID = "8897327157@axl";
   const no = isVasavi ? "8341565849" : "9347454299";
